@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulb AI - Intelligent Data Analytics Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-lightbulb text-2xl text-blue-600"></i>
+                    <span class="text-xl font-semibold text-gray-900">Bulb AI</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="sampleDataBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        Create Sample Data
+                    </button>
+                    <button id="addDataSourceBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Add Data Source
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                Your AI-Powered <span class="text-blue-600">Data Assistant</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Transform raw data into actionable insights with intelligent automation. 
+                Generate SQL and Python code, detect quality issues, and create stunning visualizations.
+            </p>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Left Panel - Query Interface -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Data Source Selection -->
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Select Data Source</h3>
+                    <select id="dataSourceSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select a data source...</option>
+                    </select>
+                </div>
+
+                <!-- Natural Language Query -->
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Ask Your Data</h3>
+                    <div class="space-y-4">
+                        <textarea 
+                            id="naturalQuery" 
+                            placeholder="Ask in plain English: 'Show me sales by region' or 'What are the top 10 products by revenue?'"
+                            class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24 resize-none"
+                        ></textarea>
+                        <button id="executeQueryBtn" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            <i class="fas fa-magic mr-2"></i>Generate & Execute
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generated Code -->
+                <div id="generatedCodeSection" class="bg-white rounded-lg shadow-sm border p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Generated Code</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-medium text-gray-700 mb-2">SQL Query</h4>
+                            <pre id="generatedSQL" class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto"></pre>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-700 mb-2">Python Code</h4>
+                            <pre id="generatedPython" class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div id="resultsSection" class="bg-white rounded-lg shadow-sm border p-6 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Query Results</h3>
+                        <div class="flex space-x-2">
+                            <button id="exportCSVBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+                                <i class="fas fa-download mr-1"></i>CSV
+                            </button>
+                            <button id="exportSQLBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm">
+                                <i class="fas fa-code mr-1"></i>SQL
+                            </button>
+                        </div>
+                    </div>
+                    <div id="resultsTable" class="overflow-x-auto"></div>
+                    <div id="resultsSummary" class="mt-4 text-sm text-gray-600"></div>
+                </div>
+
+                <!-- Visualization -->
+                <div id="visualizationSection" class="bg-white rounded-lg shadow-sm border p-6 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Data Visualization</h3>
+                        <div class="flex space-x-2">
+                            <select id="chartType" class="p-2 border border-gray-300 rounded text-sm">
+                                <option value="bar">Bar Chart</option>
+                                <option value="line">Line Chart</option>
+                                <option value="scatter">Scatter Plot</option>
+                                <option value="histogram">Histogram</option>
+                            </select>
+                            <select id="xColumn" class="p-2 border border-gray-300 rounded text-sm">
+                                <option value="">X-Axis</option>
+                            </select>
+                            <select id="yColumn" class="p-2 border border-gray-300 rounded text-sm">
+                                <option value="">Y-Axis</option>
+                            </select>
+                            <button id="createChartBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                Create Chart
+                            </button>
+                        </div>
+                    </div>
+                    <div id="chartContainer" style="height: 400px;"></div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Data Quality & Info -->
+            <div class="space-y-6">
+                <!-- Data Quality Report -->
+                <div id="qualityReportSection" class="bg-white rounded-lg shadow-sm border p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-shield-alt text-green-600 mr-2"></i>Data Quality Report
+                    </h3>
+                    <div id="qualityReport"></div>
+                </div>
+
+                <!-- Query History -->
+                <div class="bg-white rounded-lg shadow-sm border p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-history text-gray-600 mr-2"></i>Recent Queries
+                    </h3>
+                    <div id="queryHistory" class="space-y-2">
+                        <p class="text-gray-500 text-sm">No queries yet. Start by asking your data a question!</p>
+                    </div>
+                </div>
+
+                <!-- Help & Tips -->
+                <div class="bg-blue-50 rounded-lg border border-blue-200 p-6">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-4">
+                        <i class="fas fa-lightbulb text-blue-600 mr-2"></i>Quick Tips
+                    </h3>
+                    <ul class="space-y-2 text-sm text-blue-800">
+                        <li>• Ask questions in plain English</li>
+                        <li>• Try: "Show me top 10 customers by revenue"</li>
+                        <li>• Use: "Compare sales by region this year"</li>
+                        <li>• Ask: "What's the average order value?"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Data Source Modal -->
+    <div id="dataSourceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Add Data Source</h3>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="dataSourceForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" id="dsName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="My Database">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Database Type</label>
+                        <select id="dsType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="sqlite">SQLite</option>
+                            <option value="postgresql">PostgreSQL</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="sqlserver">SQL Server</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Connection String</label>
+                        <input type="text" id="dsConnection" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="database.db or connection string">
+                    </div>
+                    <div class="flex space-x-3 pt-4">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            Add Data Source
+                        </button>
+                        <button type="button" id="cancelModalBtn" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors font-semibold">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-lg p-8 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-gray-700">Processing your query...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
